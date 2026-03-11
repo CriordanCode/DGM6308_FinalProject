@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace CardGame;
 
 
@@ -11,6 +13,8 @@ public class Player
 
     public List<Card> Deck { get; }
     public List<Card> CurrentHand;
+    public List<Card> CurrentRound;
+    public List<Card> Discard;
 
     public Player(int idIn, bool isHuman)
     {
@@ -28,13 +32,33 @@ public class Player
         Deck.Add(new Joker());
         Deck.Shuffle();
         CurrentHand = new List<Card>();
+        CurrentRound = new List<Card>();
+        Discard = new List<Card>();
     }
 
 
     public void Draw()
     {
-        CurrentHand.Add(deck[0]);
-        Deck.Remove(deck[0]);
+        CurrentHand.Add(Deck[0]);
+        Deck.Remove(Deck[0]);
     }
 
+    public void PlayCard(int selection)
+    {
+        CurrentRound.Add(CurrentHand[selection]);
+        //CurrentHand.RemoveAt(selection);
+    }
+
+    public void RecallCard(int selection)
+    {
+        CurrentRound.Remove(CurrentHand[selection]);
+    }
+
+    public void ConfirmPlay()
+    {
+        foreach(Card card in CurrentRound)
+        {
+            CurrentHand.Remove(card);
+        }
+    }
 }

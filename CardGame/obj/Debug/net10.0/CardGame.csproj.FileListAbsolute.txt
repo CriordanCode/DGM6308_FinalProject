@@ -1,0 +1,15 @@
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\bin\Debug\net10.0\CardGame.exe
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\bin\Debug\net10.0\CardGame.deps.json
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\bin\Debug\net10.0\CardGame.runtimeconfig.json
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\bin\Debug\net10.0\CardGame.dll
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\bin\Debug\net10.0\CardGame.pdb
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.AssemblyInfoInputs.cache
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.AssemblyInfo.cs
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.csproj.CoreCompileInputs.cache
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.sourcelink.json
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.dll
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\refint\CardGame.dll
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.pdb
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\CardGame.genruntimeconfig.cache
+C:\Users\Corwi\Documents\GitHub\DGM6308_FinalProject\CardGame\obj\Debug\net10.0\ref\CardGame.dll
