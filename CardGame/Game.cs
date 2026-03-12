@@ -40,6 +40,11 @@ public class Game
         }
         SuitRound = 0;
         Winner = 0;
+        for(int i = 0; i < 10; i++)
+        {
+            PlayerOne.Draw();
+            PlayerTwo.Draw();
+        }
     }
 
     public void PickNewSuit()
@@ -52,10 +57,10 @@ public class Game
     {
         int playerSelection = 0;
         bool turnOver = false;
+        
         if(currentPlayer.Human == true){
             while (!turnOver)
             {
-            
                 switch (Console.ReadKey(true).Key)
                 {
                     case ConsoleKey.A : playerSelection = playerSelection == 0 ? currentPlayer.CurrentHand.Count : playerSelection--; break;
@@ -74,6 +79,14 @@ public class Game
 
     public void PlayRound()
     {
+        while(PlayerOne.CurrentHand.Count < 10)
+        {
+            PlayerOne.Draw();
+        }
+        while(PlayerTwo.CurrentHand.Count < 10)
+        {
+            PlayerTwo.Draw();
+        }
         PlayTurn(PlayerOne);
         PlayTurn(PlayerTwo);
     }

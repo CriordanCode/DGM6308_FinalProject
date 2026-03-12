@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace CardGame;
 
 
@@ -30,7 +28,9 @@ public class Player
         }
         Deck.Add(new Joker());
         Deck.Add(new Joker());
-        Deck.Shuffle();
+        Card[] temp = Deck.ToArray();
+        Random.Shared.Shuffle(temp);
+        Deck = temp.ToList();
         CurrentHand = new List<Card>();
         CurrentRound = new List<Card>();
         Discard = new List<Card>();

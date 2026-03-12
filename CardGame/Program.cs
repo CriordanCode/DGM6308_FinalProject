@@ -1,15 +1,15 @@
 ﻿
-using System.Text;
 
-Exception? exception = null;
 
 
 
 
 try{
+    Console.OutputEncoding = Encoding.UTF8;
     Game main = ShowIntroRules();
     Console.Clear();
     RunGame(main);
+    
 }
 catch{
     
@@ -63,8 +63,11 @@ void RunGame(Game game)
     while(game.Winner == 0)
     {
         game.PickNewSuit();
+        
         RenderGame(game);
+
         game.PlayRound();
+        
     }
 }
 
@@ -73,28 +76,29 @@ void RenderGame(Game game)
 {
     Console.Clear();
     Console.WriteLine("A");
-    PrintHand(game);
-    List<String> displayRaw = Enumerable.Repeat(string.Empty, 10).ToList();
-    RenderHand(game, displayRaw);
-    StringBuilder display = new StringBuilder();
-    display.Append(PrintSuitRound(game));
-    display.AppendLine();
-    foreach(string renderString in displayRaw)
-    {
-        display.AppendLine(renderString);
-    }
+    Console.WriteLine(PrintSuitRound(game));
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine(RenderHand(game));
 
-    Console.WriteLine(display);
+
+
 }
 
-void RenderHand(Game game, List<String> display)
+StringBuilder RenderHand(Game game)
 {
-    
+    StringBuilder finalDisp = new StringBuilder();
+    List<String> display = Enumerable.Repeat(string.Empty, 5).ToList();
     foreach(Card card in game.PlayerOne.CurrentHand)
     {
-        Console.WriteLine("W");
         card.PrintCard(display);
     }
+    foreach(string dispStr in display)
+    {
+        finalDisp.AppendLine(dispStr);
+    }
+    return finalDisp;
 }
 
 void PrintHand(Game game)
@@ -121,8 +125,26 @@ void PrintHand(Game game)
 StringBuilder PrintSuitRound(Game game)
 {
     StringBuilder suitDisplay = new StringBuilder();
-    suitDisplay.AppendLine("╔═══════════════╗");
-    suitDisplay.AppendLine($"║Current Suit: {game.SuitRound}║");
-    suitDisplay.AppendLine("╚═══════════════╝");
+    string suitChar;
+    if(game.SuitRound == 0)
+    {
+        suitChar = "♠";    
+    } else if(game.SuitRound == 1)
+    {
+        suitChar = "♥";
+    } else if(game.SuitRound == 2)
+    {
+        suitChar = "♦"; 
+    } else if(game.SuitRound == 3)
+    {
+        suitChar = "♣";
+    }
+    else
+    {
+        suitChar = "N/A";
+    }
+    suitDisplay.AppendLine("╔════════════════╗");
+    suitDisplay.AppendLine($"║Current Suit: {suitChar} ║");
+    suitDisplay.AppendLine("╚════════════════╝");
     return suitDisplay;
 }
