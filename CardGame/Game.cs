@@ -52,19 +52,81 @@ public class Game
         SuitRound = Random.Shared.Next(0,4);
     }
 
+    StringBuilder PrintSuitRound()
+    {
+        StringBuilder suitDisplay = new StringBuilder();
+        string suitChar;
+        if(SuitRound == 0)
+        {
+            suitChar = "♠";    
+        } else if(SuitRound == 1)
+        {
+            suitChar = "♥";
+        } else if(SuitRound == 2)
+        {
+            suitChar = "♦"; 
+        } else if(SuitRound == 3)
+        {
+            suitChar = "♣";
+        }
+        else
+        {
+            suitChar = "N/A";
+        }
+        suitDisplay.AppendLine("╔════════════════╗");
+        suitDisplay.AppendLine($"║Current Suit: {suitChar} ║");
+        suitDisplay.AppendLine("╚════════════════╝");
+        return suitDisplay;
+    }
+
+    StringBuilder RenderHand(Player currP)
+    {
+        StringBuilder finalDisp = new StringBuilder();
+        List<String> display = Enumerable.Repeat(string.Empty, 6).ToList();
+        for(int i = 0; i < currP.CurrentHand.Count; i++)
+        {
+            currP.CurrentHand[i].PrintCard(display);
+            currP.CurrentHand[i].PrintCardState(display);
+        }
+        foreach(string dispStr in display)
+        {
+            finalDisp.AppendLine(dispStr);
+        }
+        return finalDisp;
+    }
 
     public void PlayTurn(Player currentPlayer)
     {
+        int playerSelectionPrev = 0;
         int playerSelection = 0;
         bool turnOver = false;
         
         if(currentPlayer.Human == true){
             while (!turnOver)
             {
+                RenderGameState();
                 switch (Console.ReadKey(true).Key)
                 {
-                    case ConsoleKey.A : playerSelection = playerSelection == 0 ? currentPlayer.CurrentHand.Count : playerSelection--; break;
-                    case ConsoleKey.D : playerSelection = playerSelection == currentPlayer.CurrentHand.Count ? 0 : playerSelection++; break;
+                    case ConsoleKey.A :
+                        playerSelectionPrev = playerSelection;
+                        playerSelection --; 
+                        if(playerSelection == -1)
+                        {
+                            playerSelection = currentPlayer.CurrentHand.Count - 1;
+                        }
+                        currentPlayer.CurrentHand[playerSelectionPrev].Selected = false; 
+                        currentPlayer.CurrentHand[playerSelection].Selected = true; 
+                        break;
+                    case ConsoleKey.D : 
+                        playerSelectionPrev = playerSelection;
+                        playerSelection ++;
+                        if(playerSelection == currentPlayer.CurrentHand.Count)
+                        {
+                            playerSelection = 0;
+                        }
+                        currentPlayer.CurrentHand[playerSelectionPrev].Selected = false;
+                        currentPlayer.CurrentHand[playerSelection].Selected = true;
+                        break;
                     case ConsoleKey.W : currentPlayer.PlayCard(playerSelection); break;
                     case ConsoleKey.S : currentPlayer.RecallCard(playerSelection); break;
                     case ConsoleKey.Spacebar: currentPlayer.ConfirmPlay(); turnOver = true; break;
@@ -73,12 +135,30 @@ public class Game
             }
         } else
         {
+            Console.WriteLine("Turn 2");
             ComputerTurn(currentPlayer);
         }
     }
 
+    public void RenderGameState()
+    {
+        Console.Clear();
+        Console.WriteLine(PrintSuitRound());
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("yep");
+        Console.WriteLine(RenderHand(PlayerOne));
+        Console.WriteLine("yep");
+        Console.WriteLine(RenderHand(PlayerTwo));
+        Console.WriteLine();
+        Console.WriteLine();
+        Console.WriteLine("Score Player One: " + PlayerOne.Score);
+        Console.WriteLine("Score Player Two: " + PlayerTwo.Score);
+    }
+
     public void PlayRound()
     {
+        PickNewSuit();
         while(PlayerOne.CurrentHand.Count < 10)
         {
             PlayerOne.Draw();
@@ -89,6 +169,13 @@ public class Game
         }
         PlayTurn(PlayerOne);
         PlayTurn(PlayerTwo);
+        Console.WriteLine("Player One Hand Score Before Modifiers: " + ScoreHand(PlayerOne));
+        Console.WriteLine("Player Two Hand Score Before Modifiers: " + ScoreHand(PlayerTwo));
+        (int x, int y) finaleScore = ScoreRound();
+        Console.WriteLine("Player One Hand Score After Modifiers: " + finaleScore.x);
+        Console.WriteLine("Player Two Hand Score After Modifiers: " + finaleScore.y);
+        Console.ReadKey(true);
+        CheckForWinner();
     }
 
 
@@ -100,24 +187,26 @@ public class Game
             if(card.Suit == SuitRound)
             {
                 if(currentPlayer.CurrentRound.Count > 4){
-                    foreach(Card playedCard in currentPlayer.CurrentRound)
+                    if(card.Value > currentPlayer.CurrentRound[0].Value)
                     {
-                        if(card.Value > playedCard.Value)
-                        {
-                            currentPlayer.CurrentRound.Remove(playedCard);
-                            currentPlayer.CurrentRound.Add(card);
-                            currentPlayer.CurrentHand.Add(playedCard);
-                            currentPlayer.CurrentHand.Remove(card);
-                        }
+                        currentPlayer.CurrentRound.RemoveAt(0);
+                        currentPlayer.CurrentRound.Add(card);
                     }
                 } else
                 {
-                    currentPlayer.CurrentHand.Remove(card);
                     currentPlayer.CurrentRound.Add(card);
+                    card.Played = true;
                 }
             }
            
         }
+        RenderGameState();
+        foreach(Card playedCard in currentPlayer.CurrentRound)
+        {
+            currentPlayer.CurrentHand.Remove(playedCard);
+        }
+        
+        Console.WriteLine("Computer Turn Over");
     }
 
     public void SortHand(List<Card> Hand)
@@ -227,7 +316,7 @@ public class Game
         }
     }
 
-    public void ScoreRound()
+    public (int x, int y) ScoreRound()
     {
         int playerOneTempScore = ScoreHand(PlayerOne);
         int playerTwoTempScore = ScoreHand(PlayerTwo);
@@ -255,7 +344,7 @@ public class Game
                 PlayerTwo.Score += playerTwoTempScore;
             }
         }
-        
+        return (playerOneTempScore, playerTwoTempScore);
         
     }
 

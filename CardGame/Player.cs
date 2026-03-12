@@ -46,12 +46,15 @@ public class Player
     public void PlayCard(int selection)
     {
         CurrentRound.Add(CurrentHand[selection]);
+        CurrentHand[selection].Played = true;
+        Console.WriteLine("Card Played");
         //CurrentHand.RemoveAt(selection);
     }
 
     public void RecallCard(int selection)
     {
         CurrentRound.Remove(CurrentHand[selection]);
+        CurrentHand[selection].Played = false;
     }
 
     public void ConfirmPlay()

@@ -62,9 +62,6 @@ void RunGame(Game game)
  
     while(game.Winner == 0)
     {
-        game.PickNewSuit();
-        
-        RenderGame(game);
 
         game.PlayRound();
         
@@ -80,17 +77,23 @@ void RenderGame(Game game)
     Console.WriteLine();
     Console.WriteLine();
     Console.WriteLine();
-    Console.WriteLine(RenderHand(game));
+    Console.WriteLine(RenderHand(game, game.PlayerOne));
+    Console.WriteLine();
+    Console.WriteLine(RenderHand(game, game.PlayerTwo));
+    Console.WriteLine();
+    Console.WriteLine();
+    Console.WriteLine("Score Player One: " + game.PlayerOne.Score);
+    Console.WriteLine("Score Player Two: " + game.PlayerTwo.Score);
 
 
 
 }
 
-StringBuilder RenderHand(Game game)
+StringBuilder RenderHand(Game game, Player currP)
 {
     StringBuilder finalDisp = new StringBuilder();
     List<String> display = Enumerable.Repeat(string.Empty, 5).ToList();
-    foreach(Card card in game.PlayerOne.CurrentHand)
+    foreach(Card card in currP.CurrentHand)
     {
         card.PrintCard(display);
     }

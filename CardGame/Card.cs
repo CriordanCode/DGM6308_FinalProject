@@ -4,26 +4,46 @@ public class Card
 {
     public int Value { get;set; }
     public int Suit { get;set; }
+    public bool Selected { get;set; }
+    public bool Played { get;set; }
 
     public Card (int ValueIn, int SuitIn)
     {
         Value = ValueIn;
         Suit = SuitIn;
+        Selected = false;
+        Played = false;
     }
 
     public Card()
     {
         Value = 0;
         Suit = -1;
+        Selected = false;
+        Played = false;
     }
 
     public virtual void PrintCard(List<String> render)
     {
-        render[0] +=  "╔═════╗   ";
-        render[1] += $"║{ValueToString()}░░░║   ";
-        render[2] += $"║░░{SuitToString()}░░║   ";
-        render[3] += $"║░░░{ValueToString()}║   ";
-        render[4] +=  "╚═════╝   ";
+        render[0] +=  "╔═════╗ ";
+        render[1] += $"║{ValueToString()}░░░║ ";
+        render[2] += $"║░░{SuitToString()}░░║ ";
+        render[3] += $"║░░░{ValueToString()}║ ";
+        render[4] +=  "╚═════╝ ";
+    }
+
+    public virtual void PrintCardState(List<String> render)
+    {
+        if(Selected == true)
+        {
+            render[5] += "******* ";
+        } else if(Played == true)
+        {
+            render[5] += "------- ";
+        } else
+        {
+            render[5] += "        ";
+        }
     }
 
     public virtual string RawPrintCard()
@@ -79,11 +99,11 @@ public class Joker : Card
     }
     public override void PrintCard(List<String> render)
     {
-        render[0] +=  "╔═════╗";
-        render[1] += $"║{ValueToString()}║";
-        render[2] += $"║░░{SuitToString()}░░║";
-        render[3] += $"║{ValueToString()}║";
-        render[4] +=  "╚═════╝";
+        render[0] +=  "╔═════╗ ";
+        render[1] += $"║{ValueToString()}║ ";
+        render[2] += $"║░░{SuitToString()}░░║ ";
+        render[3] += $"║{ValueToString()}║ ";
+        render[4] +=  "╚═════╝ ";
     }
     public override string SuitToString()
     {
