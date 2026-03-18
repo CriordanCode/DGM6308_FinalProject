@@ -9,7 +9,12 @@ public class Player
     public bool Human { get;}
     public int Score { get;set; }
 
-    public List<Card> Deck { get; }
+    public bool QueenPlayed{ get;set; }
+    public bool KingPlayed{ get;set; }
+    public bool JokerPlayed{ get;set; }
+    
+
+    public List<Card> Deck { get;set; }
     public List<Card> CurrentHand;
     public List<Card> CurrentRound;
     public List<Card> Discard;
@@ -28,33 +33,80 @@ public class Player
         }
         Deck.Add(new Joker());
         Deck.Add(new Joker());
-        Card[] temp = Deck.ToArray();
-        Random.Shared.Shuffle(temp);
-        Deck = temp.ToList();
+        ShuffleSimple();
         CurrentHand = new List<Card>();
         CurrentRound = new List<Card>();
         Discard = new List<Card>();
+        QueenPlayed = false;
+        KingPlayed = false;
+        JokerPlayed = false;
     }
 
+    public void ShuffleSimple()
+    {
+        Card[] temp = Deck.ToArray();
+        Random.Shared.Shuffle(temp);
+        Deck = temp.ToList();
+    }
 
     public void Draw()
     {
-        CurrentHand.Add(Deck[0]);
-        Deck.Remove(Deck[0]);
+        if(Deck.Count > 0){
+            CurrentHand.Add(Deck[0]);
+            Deck.RemoveAt(0);
+        } else
+        {
+            while(Discard.Count > 0)
+            {
+                Deck.Add(Discard[0]);
+                Discard.RemoveAt(0);
+            }
+            ShuffleSimple();
+            CurrentHand.Add(Deck[0]);
+            Deck.RemoveAt(0);
+        }
+    }
+
+    public void ClearRound()
+    {
+        while(CurrentRound.Count > 0)
+        {
+            Discard.Add(CurrentRound[0]);
+            CurrentRound.RemoveAt(0);
+        }
+        KingPlayed = false;
+        QueenPlayed = false;
+        JokerPlayed = false;
     }
 
     public void PlayCard(int selection)
     {
-        CurrentRound.Add(CurrentHand[selection]);
-        CurrentHand[selection].Played = true;
-        Console.WriteLine("Card Played");
+        if(CurrentRound.Count < 5){
+            CurrentRound.Add(CurrentHand[selection]);
+            CurrentHand[selection].Played = true;
         //CurrentHand.RemoveAt(selection);
+        } else
+        {
+            foreach(Card cMax in CurrentHand)
+            {
+                if (cMax.Equals(CurrentRound[0]))
+                {
+                    cMax.Played = false;
+                    break;
+                }
+            }
+            CurrentRound.RemoveAt(0);
+            CurrentRound.Add(CurrentHand[selection]);
+            CurrentHand[selection].Played = true;
+        }
+        Console.WriteLine("Card Played");
+
     }
 
     public void RecallCard(int selection)
     {
-        CurrentRound.Remove(CurrentHand[selection]);
         CurrentHand[selection].Played = false;
+        CurrentRound.Remove(CurrentHand[selection]);
     }
 
     public void ConfirmPlay()

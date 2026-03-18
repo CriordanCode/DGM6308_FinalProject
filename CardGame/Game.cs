@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace CardGame;
 
 
@@ -14,10 +16,6 @@ public class Game
 
     public int Winner { get; set; }
 
-    private bool OneQueenPlayed { get; set; }
-    private bool OneKingPlayed { get; set; }
-    private bool TwoQueenPlayed { get; set; }
-    private bool TwoKingPlayed { get; set; }
     
 
 
@@ -52,6 +50,11 @@ public class Game
         SuitRound = Random.Shared.Next(0,4);
     }
 
+    public void ResetRound()
+    {
+        ResetHands();
+    }
+
     StringBuilder PrintSuitRound()
     {
         StringBuilder suitDisplay = new StringBuilder();
@@ -78,7 +81,6 @@ public class Game
         suitDisplay.AppendLine("╚════════════════╝");
         return suitDisplay;
     }
-
     StringBuilder RenderHand(Player currP)
     {
         StringBuilder finalDisp = new StringBuilder();
@@ -129,7 +131,11 @@ public class Game
                         break;
                     case ConsoleKey.W : currentPlayer.PlayCard(playerSelection); break;
                     case ConsoleKey.S : currentPlayer.RecallCard(playerSelection); break;
-                    case ConsoleKey.Spacebar: currentPlayer.ConfirmPlay(); turnOver = true; break;
+                    case ConsoleKey.Spacebar: 
+                        currentPlayer.CurrentHand[playerSelection].Selected = false; 
+                        currentPlayer.ConfirmPlay(); 
+                        turnOver = true; 
+                        break;
                     default: break;
                 }
             }
@@ -146,9 +152,7 @@ public class Game
         Console.WriteLine(PrintSuitRound());
         Console.WriteLine();
         Console.WriteLine();
-        Console.WriteLine("yep");
         Console.WriteLine(RenderHand(PlayerOne));
-        Console.WriteLine("yep");
         Console.WriteLine(RenderHand(PlayerTwo));
         Console.WriteLine();
         Console.WriteLine();
@@ -159,6 +163,7 @@ public class Game
     public void PlayRound()
     {
         PickNewSuit();
+        ResetRound();
         while(PlayerOne.CurrentHand.Count < 10)
         {
             PlayerOne.Draw();
@@ -176,6 +181,7 @@ public class Game
         Console.WriteLine("Player Two Hand Score After Modifiers: " + finaleScore.y);
         Console.ReadKey(true);
         CheckForWinner();
+        
     }
 
 
@@ -196,6 +202,37 @@ public class Game
                 {
                     currentPlayer.CurrentRound.Add(card);
                     card.Played = true;
+                }
+            }
+            if(card.Value == 14)
+            {
+                if(currentPlayer.CurrentRound.Count > 4){
+                    if(card.Value > currentPlayer.CurrentRound[0].Value)
+                    {
+                        currentPlayer.CurrentRound.RemoveAt(0);
+                        currentPlayer.CurrentRound.Add(card);
+                    }
+                } else
+                {
+                    currentPlayer.CurrentRound.Add(card);
+                }
+                foreach(Card cardAce in currentPlayer.CurrentHand)
+                {
+                    if(card.Suit == cardAce.Suit)
+                    {
+                        if(currentPlayer.CurrentRound.Count > 4)
+                        {
+                            for(int iter = 0; iter < currentPlayer.CurrentRound.Count; iter++)
+                            {
+                                if(cardAce.Value > currentPlayer.CurrentRound[0].Value)
+                                {
+                                    currentPlayer.CurrentRound.RemoveAt(0);
+                                    currentPlayer.CurrentRound.Add(cardAce);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
            
@@ -244,6 +281,10 @@ public class Game
         bool jackPresent = false;
         foreach(Card card in currPlayer.CurrentRound)
         {
+            if(card.Suit == -1)
+            {
+                currPlayer.JokerPlayed = true;
+            }
             if(card.Suit == SuitRound){
                 if(card.Value < 11)
                 {
@@ -296,52 +337,56 @@ public class Game
 
     public void QueenPlayed(Player current)
     {
-        if(current.ID == 1)
-        {
-            OneQueenPlayed = true;
-        } else if(current.ID == 2)
-        {
-            TwoQueenPlayed = true;
-        }
+        current.QueenPlayed = true;
     }
 
     public void KingPlayed(Player current)
     {
-        if(current.ID == 1)
-        {
-            OneKingPlayed = true;
-        } else if(current.ID == 2)
-        {
-            TwoKingPlayed = true;
-        }
+        current.KingPlayed = true;
     }
 
     public (int x, int y) ScoreRound()
     {
         int playerOneTempScore = ScoreHand(PlayerOne);
         int playerTwoTempScore = ScoreHand(PlayerTwo);
-        if (OneQueenPlayed)
+        if (PlayerOne.QueenPlayed)
         {
             playerTwoTempScore /= 2;
         }
-        if (TwoQueenPlayed)
+        if (PlayerTwo.QueenPlayed)
         {
             playerOneTempScore /= 2;
         }
-        if(OneKingPlayed && !TwoKingPlayed)
+        if(PlayerOne.KingPlayed && !PlayerTwo.KingPlayed)
         {
             PlayerOne.Score += playerOneTempScore;
-        } else if(!OneKingPlayed && TwoKingPlayed)
+            if(PlayerOne.JokerPlayed == true)
+            {
+                PlayerOne.Score += playerOneTempScore;
+            }
+        } else if(!PlayerOne.KingPlayed && PlayerTwo.KingPlayed)
         {
             PlayerTwo.Score += playerTwoTempScore;
+            if(PlayerTwo.JokerPlayed == true)
+            {
+                PlayerTwo.Score += playerTwoTempScore;
+            }
         } else
         {
             if(playerOneTempScore > playerTwoTempScore)
             {
                 PlayerOne.Score += playerOneTempScore;
+                if(PlayerOne.JokerPlayed == true)
+                {
+                    PlayerOne.Score += playerOneTempScore;
+                }
             } else if(playerOneTempScore < playerTwoTempScore)
             {
                 PlayerTwo.Score += playerTwoTempScore;
+                if(PlayerTwo.JokerPlayed == true)
+                {
+                    PlayerTwo.Score += playerTwoTempScore;
+                }
             }
         }
         return (playerOneTempScore, playerTwoTempScore);
@@ -358,4 +403,11 @@ public class Game
             Winner = 2;
         }
     }
+
+    public void ResetHands()
+    {
+        PlayerOne.ClearRound();
+        PlayerTwo.ClearRound();
+    }
+
 }
