@@ -1,26 +1,16 @@
-using System.Runtime.CompilerServices;
-
 namespace CardGame;
-
-
-
-
-
 
 public class Game
 {
     public Player PlayerOne { get; }
     public Player PlayerTwo { get; }
-
     public int SuitRound { get;set; }
-
     public int Winner { get; set; }
 
-    
-
-
-
-
+    //Constructor to create the game based on how many human
+    //players were given, as it is a two player game all scenarios
+    //are covered, 2 CPU, 1 Human 1 CPU, 2 Human and then makes sure
+    //to draw up to 10 cards for each player to start the game.
     public Game(int humans)
     {
         if(humans == 2)
@@ -45,16 +35,24 @@ public class Game
         }
     }
 
+    //Set the current suit round
     public void PickNewSuit()
     {
         SuitRound = Random.Shared.Next(0,4);
     }
 
+    //Clear the player values for the next round
+    //cleans up variables like if specific face
+    //cards were played for the next round so that
+    //those values don't carry over.
     public void ResetRound()
     {
-        ResetHands();
+        PlayerOne.ClearRound();
+        PlayerTwo.ClearRound();
     }
 
+    //Method to build the display for what suit
+    //the current round is for the players.
     StringBuilder PrintSuitRound()
     {
         StringBuilder suitDisplay = new StringBuilder();
@@ -71,8 +69,7 @@ public class Game
         } else if(SuitRound == 3)
         {
             suitChar = "♣";
-        }
-        else
+        } else
         {
             suitChar = "N/A";
         }
@@ -81,14 +78,19 @@ public class Game
         suitDisplay.AppendLine("╚════════════════╝");
         return suitDisplay;
     }
-    StringBuilder RenderHand(Player currP)
+
+    //Method to display the hahnd of the current player selected
+    //goes through and prints the card and display into a list of strings
+    //that can be appened horizontally so that I can update the list
+    //while display all cards in a line
+    StringBuilder RenderHand(List<Card> currHand)
     {
         StringBuilder finalDisp = new StringBuilder();
         List<String> display = Enumerable.Repeat(string.Empty, 6).ToList();
-        for(int i = 0; i < currP.CurrentHand.Count; i++)
+        for(int i = 0; i < currHand.Count; i++)
         {
-            currP.CurrentHand[i].PrintCard(display);
-            currP.CurrentHand[i].PrintCardState(display);
+            currHand[i].PrintCard(display);
+            currHand[i].PrintCardState(display);
         }
         foreach(string dispStr in display)
         {
@@ -97,6 +99,11 @@ public class Game
         return finalDisp;
     }
 
+    //Method to govern the logic of a turn for the player
+    //if it is a human player it relies on input from the
+    //keyboard to move the selector and select each card
+    //however if it is a computer it just calls a different method
+    //for the computer to use logic to complete its turn
     public void PlayTurn(Player currentPlayer)
     {
         int playerSelectionPrev = 0;
@@ -146,20 +153,30 @@ public class Game
         }
     }
 
+    //Method to render the console output of the game
+    //It will show the current hands and then the current
+    //score of each player below that
     public void RenderGameState()
     {
         Console.Clear();
         Console.WriteLine(PrintSuitRound());
         Console.WriteLine();
         Console.WriteLine();
-        Console.WriteLine(RenderHand(PlayerOne));
-        Console.WriteLine(RenderHand(PlayerTwo));
+        Console.WriteLine(RenderHand(PlayerOne.CurrentHand));
+        Console.WriteLine(RenderHand(PlayerTwo.CurrentHand));
         Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine("Score Player One: " + PlayerOne.Score);
         Console.WriteLine("Score Player Two: " + PlayerTwo.Score);
     }
 
+    //Running through a games round it covers the logic
+    //First it picks a new suit for the round to play and then
+    //resets each players variables for the round, while the hands
+    //are not full it will draw them up to 10 cards and then run
+    //the play turn command on each one. after each turn it will
+    //then print the hands that were played and their scores along
+    //with the winner of each round
     public void PlayRound()
     {
         PickNewSuit();
@@ -174,22 +191,59 @@ public class Game
         }
         PlayTurn(PlayerOne);
         PlayTurn(PlayerTwo);
+        Console.Clear();
+        Console.WriteLine("Player One Played: ");
+        Console.WriteLine(RenderHand(PlayerOne.CurrentRound));
+        Console.WriteLine();
+        Console.WriteLine("Player Two Played: ");
+        Console.WriteLine(RenderHand(PlayerTwo.CurrentRound));
+        Console.WriteLine();
         Console.WriteLine("Player One Hand Score Before Modifiers: " + ScoreHand(PlayerOne));
         Console.WriteLine("Player Two Hand Score Before Modifiers: " + ScoreHand(PlayerTwo));
-        (int x, int y) finaleScore = ScoreRound();
-        Console.WriteLine("Player One Hand Score After Modifiers: " + finaleScore.x);
-        Console.WriteLine("Player Two Hand Score After Modifiers: " + finaleScore.y);
+        (int x, int y) finalScore = ScoreRound();
+        Console.WriteLine("Player One Hand Score After Modifiers: " + finalScore.x);
+        Console.WriteLine("Player Two Hand Score After Modifiers: " + finalScore.y);
+        Console.WriteLine();
+        PrintRoundWinner(finalScore);
+        Console.WriteLine("Press Any Key to start the next round.");
         Console.ReadKey(true);
         CheckForWinner();
         
     }
 
-
-    //Revist logic for computer turn eventually (does not account for aces in hand to make better plays)
+    //Method to print the round winner to inform the player who won each round.
+    public void PrintRoundWinner((int x,int y) roundScore)
+    {
+        if(PlayerOne.KingPlayed && !PlayerTwo.KingPlayed)
+        {
+            Console.WriteLine("By Playing a King, Player One Won This Round!");
+        } else if(!PlayerOne.KingPlayed && PlayerTwo.KingPlayed)
+        {
+            Console.WriteLine("By Playing a King, Player Two Won This Round");
+        } else if(roundScore.x > roundScore.y)
+        {
+            Console.WriteLine("Player One Won This Round!");
+        } else if(roundScore.y > roundScore.x)
+        {
+            Console.WriteLine("Player Two Won This Round!");
+        } else
+        {
+            Console.WriteLine("It's A Draw! Neither Player Wins This Round.");
+        }
+        Console.WriteLine();
+    }
+    
     public void ComputerTurn(Player currentPlayer)
     {
+        Card? jokerPresent = new Joker();
+        bool hasJoker = false;
         foreach(Card card in currentPlayer.CurrentHand)
         {
+            if(card.Suit == -1)
+            {
+                jokerPresent = card;
+                hasJoker = true;
+            }
             if(card.Suit == SuitRound)
             {
                 if(currentPlayer.CurrentRound.Count > 4){
@@ -237,20 +291,32 @@ public class Game
             }
            
         }
+        if(currentPlayer.CurrentRound.Count < 5 && hasJoker)
+        {
+            currentPlayer.CurrentHand.Add(jokerPresent);
+        }
+        if(currentPlayer.CurrentRound.Count == 0)
+        {
+            while(currentPlayer.CurrentRound.Count < 3)
+            {
+                currentPlayer.PlayCard(Random.Shared.Next(0, currentPlayer.CurrentHand.Count));
+            }
+        }
         RenderGameState();
         foreach(Card playedCard in currentPlayer.CurrentRound)
         {
             currentPlayer.CurrentHand.Remove(playedCard);
         }
-        
-        Console.WriteLine("Computer Turn Over");
     }
 
+
+
+    //Method to sort hand based on suit and value
     public void SortHand(List<Card> Hand)
     {
-        bool sorted = false;
         for(int iter = 0; iter < Hand.Count; iter++)
         {
+            bool sorted = false;
             Card temp = Hand[iter];
             Hand.Remove(temp);
             for(int sortIter = 0; sortIter < Hand.Count; iter++)
@@ -274,6 +340,11 @@ public class Game
         }
 
     }
+
+    //Method to score the player hand, goes through each
+    //of the cards and if valid for scoring adds them to the
+    //current score and deals with the playing of face cards
+    //and tracking those as well
     public int ScoreHand(Player currPlayer)
     {
         int score = 0;
@@ -335,16 +406,24 @@ public class Game
         return score;
     }
 
+    //Method for if the player played a queen
     public void QueenPlayed(Player current)
     {
         current.QueenPlayed = true;
     }
-
+    //Method for if the player played a king
     public void KingPlayed(Player current)
     {
         current.KingPlayed = true;
     }
 
+    //Method that returns a tuple of the two players scores from the
+    //round after factoring in the abilities of the face cards. The logic
+    //follows this flow:
+    //Raw Scores of Hands -> Adjust if Queen Played -> Check winner if by King player ->
+    //If no kings or both players played kings, check which score is higher -> add the
+    //higher scoring players score to their total -> if the higher scoring player played
+    //a Joker add the score again (doubling their poitns earned)
     public (int x, int y) ScoreRound()
     {
         int playerOneTempScore = ScoreHand(PlayerOne);
@@ -393,6 +472,7 @@ public class Game
         
     }
 
+    //Check if either player's scores have reached 100 yet to be declared winner
     public void CheckForWinner()
     {
         if(PlayerOne.Score >= 100)
@@ -402,12 +482,6 @@ public class Game
         {
             Winner = 2;
         }
-    }
-
-    public void ResetHands()
-    {
-        PlayerOne.ClearRound();
-        PlayerTwo.ClearRound();
     }
 
 }
