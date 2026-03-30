@@ -75,6 +75,18 @@ public class Game
         suitDisplay.AppendLine("╚════════════════╝");
         return suitDisplay;
     }
+    //Method to build the display for the controls for the player to have
+    StringBuilder PrintControls()
+    {
+        StringBuilder controlDisplay = new StringBuilder();
+        controlDisplay.AppendLine("╔════════════════════════════════════════════════════════════╗");
+        controlDisplay.AppendLine("║                         Controls                           ║");
+        controlDisplay.AppendLine("║ A - Move Card Selector Left ║ D - Move Card Selector Right ║");
+        controlDisplay.AppendLine("║ W - Play Selected Card      ║ S - Recall Selected Card     ║");
+        controlDisplay.AppendLine("║          Space - Confirm Hand To Play this round           ║");
+        controlDisplay.AppendLine("╚════════════════════════════════════════════════════════════╝");
+        return controlDisplay;
+    }
     //Method to display the hahnd of the current player selected
     //goes through and prints the card and display into a list of strings
     //that can be appened horizontally so that I can update the list
@@ -155,13 +167,13 @@ public class Game
         Console.Clear();
         Console.WriteLine(PrintSuitRound());
         Console.WriteLine();
-        Console.WriteLine();
         Console.WriteLine(RenderHand(PlayerOne.CurrentHand));
         Console.WriteLine(RenderHand(PlayerTwo.CurrentHand));
         Console.WriteLine();
-        Console.WriteLine();
         Console.WriteLine("Score Player One: " + PlayerOne.Score);
         Console.WriteLine("Score Player Two: " + PlayerTwo.Score);
+        Console.WriteLine();
+        Console.WriteLine(PrintControls());
     }
     //Running through a games round it covers the logic
     //First it picks a new suit for the round to play and then
