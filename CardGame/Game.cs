@@ -34,13 +34,11 @@ public class Game
             PlayerTwo.Draw();
         }
     }
-
     //Set the current suit round
     public void PickNewSuit()
     {
         SuitRound = Random.Shared.Next(0,4);
     }
-
     //Clear the player values for the next round
     //cleans up variables like if specific face
     //cards were played for the next round so that
@@ -50,7 +48,6 @@ public class Game
         PlayerOne.ClearRound();
         PlayerTwo.ClearRound();
     }
-
     //Method to build the display for what suit
     //the current round is for the players.
     StringBuilder PrintSuitRound()
@@ -78,7 +75,6 @@ public class Game
         suitDisplay.AppendLine("╚════════════════╝");
         return suitDisplay;
     }
-
     //Method to display the hahnd of the current player selected
     //goes through and prints the card and display into a list of strings
     //that can be appened horizontally so that I can update the list
@@ -98,7 +94,6 @@ public class Game
         }
         return finalDisp;
     }
-
     //Method to govern the logic of a turn for the player
     //if it is a human player it relies on input from the
     //keyboard to move the selector and select each card
@@ -152,7 +147,6 @@ public class Game
             ComputerTurn(currentPlayer);
         }
     }
-
     //Method to render the console output of the game
     //It will show the current hands and then the current
     //score of each player below that
@@ -169,7 +163,6 @@ public class Game
         Console.WriteLine("Score Player One: " + PlayerOne.Score);
         Console.WriteLine("Score Player Two: " + PlayerTwo.Score);
     }
-
     //Running through a games round it covers the logic
     //First it picks a new suit for the round to play and then
     //resets each players variables for the round, while the hands
@@ -210,7 +203,6 @@ public class Game
         CheckForWinner();
         
     }
-
     //Method to print the round winner to inform the player who won each round.
     public void PrintRoundWinner((int x,int y) roundScore)
     {
@@ -232,7 +224,6 @@ public class Game
         }
         Console.WriteLine();
     }
-    
     public void ComputerTurn(Player currentPlayer)
     {
         Card? jokerPresent = new Joker();
@@ -308,9 +299,6 @@ public class Game
             currentPlayer.CurrentHand.Remove(playedCard);
         }
     }
-
-
-
     //Method to sort hand based on suit and value
     public void SortHand(List<Card> Hand)
     {
@@ -340,7 +328,6 @@ public class Game
         }
 
     }
-
     //Method to score the player hand, goes through each
     //of the cards and if valid for scoring adds them to the
     //current score and deals with the playing of face cards
@@ -405,7 +392,6 @@ public class Game
         }
         return score;
     }
-
     //Method for if the player played a queen
     public void QueenPlayed(Player current)
     {
@@ -416,7 +402,6 @@ public class Game
     {
         current.KingPlayed = true;
     }
-
     //Method that returns a tuple of the two players scores from the
     //round after factoring in the abilities of the face cards. The logic
     //follows this flow:
@@ -471,7 +456,6 @@ public class Game
         return (playerOneTempScore, playerTwoTempScore);
         
     }
-
     //Check if either player's scores have reached 100 yet to be declared winner
     public void CheckForWinner()
     {
@@ -483,5 +467,4 @@ public class Game
             Winner = 2;
         }
     }
-
 }
